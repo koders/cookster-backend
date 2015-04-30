@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
+
+    <persistence-unit name="CookingAppPersistenceUnit" transaction-type="RESOURCE_LOCAL">
+
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+
+
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+
+        <properties>
+            <!--<property name="eclipselink.ddl-generation" value="create-or-extend-tables" />-->
+            <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
+
+            <!--*****************************************************************************************************-->
+
+            <property name="javax.persistence.lock.timeout" value="5000" />
+            <!--<property name="eclipselink.ddl-generation.output-mode" value="both" />-->
+            <property name="eclipselink.logging.level" value="FINE"/>
+            <property name="eclipselink.query-results-cache" value="false"/>
+            <property name="eclipselink.cache.shared.default" value="false"/>
+
+
+            // LOCAL
+            <!--<property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/cooking?useUnicode=true&amp;characterSetResults=UTF-8&amp;characterEncoding=UTF8&amp;max_allowed_packet=20M"></property>-->
+            <!--<property name="javax.persistence.jdbc.user" value="root"></property>-->
+            <!--<property name="javax.persistence.jdbc.password" value=""></property>-->
+            <!--<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"></property>-->
+
+            // FOR AZURE CLOUD
+            <!--<property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://v716d55rig.database.windows.net:1433;databaseName=cookster;encrypt=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;"></property>-->
+            <!--<property name="javax.persistence.jdbc.user" value="emil@v716d55rig"></property>-->
+            <!--<property name="javax.persistence.jdbc.password" value="Viktorija1994"></property>-->
+            <!--<property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"></property>-->
+
+            // FOR HEROKU CLOUD (POSTGRES)
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://ec2-23-21-140-156.compute-1.amazonaws.com:5432/d7aq7v692v20c6?useUnicode=true&amp;characterSetResults=UTF-8&amp;characterEncoding=UTF8&amp;ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory" />
+            <property name="javax.persistence.jdbc.user" value="pniezgcjbhifyb" />
+            <property name="javax.persistence.jdbc.password" value="qNAq9X83nSsPPkWhdj1ecMuVpR" />
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+
+
+        </properties>
+    </persistence-unit>
+</persistence>

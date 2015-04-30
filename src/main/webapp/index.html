@@ -1,4 +1,122 @@
+<!doctype html>
 <html>
-<head></head>
-<body>Sup?</body>
+<head>
+  <meta charset="utf-8">
+  <title>ez pz cookster admin</title>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/pure.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script src="js/libs/jquery-1.10.2.js"></script>
+  <script src="js/app.js"></script>
+</head>
+<body>
+  <div id="layout">
+    <a href="#menu" id="menuLink" class="menu-link">
+      <span></span>
+    </a>
+
+    <div id="menu">
+      <div class="pure-menu pure-menu-open">
+        <ul>
+          <li class="pure-menu-heading">Cookster</li>
+          <li><a href="https://bitbucket.org/cooksterteam" target="_blank">Bitbucket</a></li>
+          <li><a href="http://www.cooksterapp.com/" target="_blank">Website</a></li>
+
+          <li class="pure-menu-heading">Admin</li>
+          <li><a href="/">create recipe</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="main">
+      <div class="header"></div>
+      <div class="content">
+        <form method="POST" action="http://localhost:8080/CookingServices/rest/recipes/create"
+              enctype="multipart/form-data" class="pure-form pure-form-aligned">
+          <fieldset>
+            <!-- Recipe stuff -->
+            <div class="pure-control-group">
+              <label for="shortName">Short Name</label>
+              <input id="shortName" name="shortName" type="text" placeholder="Short name">
+            </div>
+
+            <div class="pure-control-group">
+              <label for="longName">Long Name</label>
+              <input id="longName" name="longName" type="text" placeholder="Long Name">
+            </div>
+
+            <div class="pure-control-group">
+              <label for="experience">Experience</label>
+              <input id="experience" name="experience" type="text" placeholder="Experience">
+            </div>
+
+            <div class="pure-control-group">
+              <label for="time">Time</label>
+              <input id="time" name="time" type="text" placeholder="Time">
+            </div>
+
+            <div class="pure-control-group">
+              <label for="description">Description</label>
+              <input id="description" name="description" type="text" placeholder="Description">
+            </div>
+
+            <div class="pure-control-group">
+              <label for="category">Category</label>
+              <select id="category" name="category">
+                <option value="4">Kūkas</option>
+                <option value="5">Veģetāri ēdieni</option>
+                <option value="6">Uzkodas</option>
+                <option value="7">Grila ēdieni</option>
+                <option value="8">Gaļas ēdieni</option>
+                <option value="9">Zupas</option>
+                <option value="10">Brokastu ēdieni</option>
+              </select>
+            </div>
+
+            <div class="pure-control-group">
+              <label for="level">Level</label>
+              <select id="level" name="level">
+                <option value="1">Slow</option>
+                <option value="2">Medium</option>
+                <option value="3">Fast</option>
+              </select>
+            </div>
+
+            <div class="pure-control-group">
+              <label for="author">Author</label>
+              <select id="author" name="author">
+                <option value="11">Cepēji un šmorētāji</option>
+              </select>
+            </div>
+
+            <div class="pure-control-group">
+              <label for="picture">Picture</label>
+              <input id="picture" name="picture" type="file" placeholder="Picture">
+            </div>
+
+            <div class="pure-control-group">
+              <label for="thumbnail">Thumbnail</label>
+              <input id="thumbnail" name="thumbnail" type="file" placeholder="Thumbnail">
+            </div>
+
+            <!-- Steps -->
+            <div class="pure-control-group" id="stepsDiv">
+            </div>
+
+            <div class="pure-controls">
+              <button id="addStep" class="pure-button">Add step</button>
+              <button id="removeStep" class="pure-button">Remove step</button>
+            </div>
+            <div class="pure-controls">
+              <button id="submitForm" type="submit" class="pure-button pure-button-primary">Submit</button>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+      </div>
+    </div>
+  </div>
+
+</body>
 </html>

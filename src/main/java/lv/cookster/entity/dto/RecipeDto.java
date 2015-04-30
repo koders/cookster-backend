@@ -1,9 +1,9 @@
 package lv.cookster.entity.dto;
 
-import lv.lu.cooking.services.entity.Author;
-import lv.lu.cooking.services.entity.Category;
-import lv.lu.cooking.services.entity.Ingredient;
-import lv.lu.cooking.services.entity.Level;
+import lv.cookster.entity.Author;
+import lv.cookster.entity.Category;
+import lv.cookster.entity.Ingredient;
+import lv.cookster.entity.Level;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import java.sql.Timestamp;

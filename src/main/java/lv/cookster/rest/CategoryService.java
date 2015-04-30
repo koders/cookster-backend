@@ -1,6 +1,7 @@
 package lv.cookster.rest;
 
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.FormDataParam;
 import lv.cookster.entity.*;
 import lv.cookster.entity.dto.RecipeDto;
@@ -64,11 +65,15 @@ public class CategoryService extends CookingService{
     @Path("/create")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public OperationResult create(@FormDataParam("name") String name,
-                                  @FormDataParam("picture") InputStream uploadedInputStream,
-                                  @FormDataParam("picture") FormDataContentDisposition fileDetail,
-                                  @FormDataParam("isPaid") boolean isPaid,
-                                  @FormDataParam("price") double price) {
+    public OperationResult createCategoryRest(FormDataMultiPart multiPart) {
+        String name = multiPart.getField("name").getValueAs(String.class);
+        InputStream uploadedInputStream = multiPart.getField("picture").getValueAs(InputStream.class);
+        boolean isPaid = multiPart.getField("isPaid").getValueAs(boolean.class);
+        double price = multiPart.getField("price").getValueAs(double.class);
+//                                  @FormDataParam("picture") InputStream uploadedInputStream,
+//                                  @FormDataParam("picture") FormDataContentDisposition fileDetail,
+//                                  @FormDataParam("isPaid") boolean isPaid,
+//                                  @FormDataParam("price") double price) {
         OperationResult result = new OperationResult();
         try {
             Log.log(Level.SEVERE, "### Calling createCategory");
@@ -101,7 +106,7 @@ public class CategoryService extends CookingService{
     @POST
     @Path("/{id}/edit")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public OperationResult create(@PathParam("id") String id,
+    public OperationResult editCategoryRest(@PathParam("id") String id,
                                   @FormParam("name") String name) {
         OperationResult result = new OperationResult();
         try {

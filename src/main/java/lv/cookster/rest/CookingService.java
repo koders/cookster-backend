@@ -6,6 +6,7 @@ import lv.cookster.entity.dto.RecipeDto;
 import lv.cookster.util.Constants;
 import lv.cookster.util.Utils;
 import org.apache.commons.io.FileUtils;
+import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -23,7 +24,7 @@ import java.util.UUID;
  *
  * @author Rihards
  */
-public class CookingService {
+public class CookingService extends ResourceConfig{
 
     protected EntityManagerFactory emf;
     protected EntityManager em;

@@ -113,6 +113,27 @@
             <version>9.0-801.jdbc4</version>
         </dependency>
 
+        <!-- ehcache -->
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>2.6.11</version>
+        </dependency>
+
+        <!-- OAuth -->
+        <dependency>
+            <groupId>org.glassfish.jersey.security</groupId>
+            <artifactId>oauth1-server</artifactId>
+            <version>2.17</version>
+        </dependency>
+
+        <!-- RestFB -->
+        <dependency>
+            <groupId>com.restfb</groupId>
+            <artifactId>restfb</artifactId>
+            <version>1.10.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -155,6 +176,7 @@
                         <webInfIncludeJarPattern>.*/.*jersey-[^/]\.jar$</webInfIncludeJarPattern>
                     </webApp>
                     <war>${project.build.directory}/${project.build.finalName}.war</war>
+                    <scanIntervalSeconds>0</scanIntervalSeconds>
                 </configuration>
             </plugin>
         </plugins>

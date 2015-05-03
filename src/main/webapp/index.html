@@ -32,6 +32,18 @@
     <div id="main">
       <div class="header"></div>
       <div class="content">
+
+        <!--
+          Below we include the Login Button social plugin. This button uses
+          the JavaScript SDK to present a graphical Login button that triggers
+          the FB.login() function when clicked.
+        -->
+
+        <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+        </fb:login-button>
+
+        <div id="status">
+        </div>
         <form method="POST" action="http://localhost:8080/CookingServices/rest/recipes/create"
               enctype="multipart/form-data" class="pure-form pure-form-aligned">
           <fieldset>
@@ -111,7 +123,6 @@
             <div class="pure-controls">
               <button id="submitForm" type="submit" class="pure-button pure-button-primary">Submit</button>
             </div>
-          </div>
         </fieldset>
       </form>
       </div>

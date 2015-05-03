@@ -1,12 +1,14 @@
-package lv.cookster.rest;
+package lv.cookster.rest.admin;
 
 import lv.cookster.entity.Author;
 import lv.cookster.entity.Category;
 import lv.cookster.entity.Level;
 import lv.cookster.entity.OperationResult;
+import lv.cookster.rest.CookingService;
 
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityTransaction;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -15,12 +17,13 @@ import java.util.logging.Logger;
 /**
  * Created by Rihards on 15.06.2014.
  */
-@Path("init")
+@Path("/admin/init")
+@RolesAllowed("admin")
 public class InitService extends CookingService {
 
-    private final static Logger Log = Logger.getLogger(CookingService.class.getName());
+    private final static Logger Log = Logger.getLogger(InitService.class.getName());
 
-    @PUT
+    @POST
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public OperationResult initialize() {
 

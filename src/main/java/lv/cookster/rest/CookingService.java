@@ -1,12 +1,12 @@
 package lv.cookster.rest;
 
+import com.restfb.FacebookClient;
 import lv.cookster.entity.OperationResult;
 import lv.cookster.entity.Recipe;
 import lv.cookster.entity.dto.RecipeDto;
 import lv.cookster.util.Constants;
-import lv.cookster.util.Utils;
+import net.sf.ehcache.CacheManager;
 import org.apache.commons.io.FileUtils;
-import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -24,14 +24,19 @@ import java.util.UUID;
  *
  * @author Rihards
  */
-public class CookingService extends ResourceConfig{
+public class CookingService {
 
     protected EntityManagerFactory emf;
     protected EntityManager em;
+    protected CacheManager cm = CacheManager.getInstance();
+    protected FacebookClient facebookClient;
 
     public CookingService() {
         emf = Persistence.createEntityManagerFactory(Constants.CONNECTION_NAME, System.getProperties());
         em = emf.createEntityManager();
+        if(cm.getCache("recipeCache") == null) {
+            cm.addCache("recipeCache");
+        }
     }
 
     protected String findParam(UriInfo uriInfo, String parameterName) {

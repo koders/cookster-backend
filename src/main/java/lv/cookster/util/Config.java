@@ -1,9 +1,5 @@
 package lv.cookster.util;
 
-import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
-import lv.cookster.rest.CategoryService;
-import lv.cookster.rest.admin.CategoryAdminService;
-import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;

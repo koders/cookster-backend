@@ -27,7 +27,7 @@ public class Main {
         // container. Setting parent loader priority to true changes this behavior.
         // Read more here: http://wiki.eclipse.org/Jetty/Reference/Jetty_Classloading
         root.setParentLoaderPriority(true);
-        root.addServerClass("lv.cookster");
+//        root.addServerClass("lv.cookster");
 
         final String webappDirLocation = "src/main/webapp/";
         root.setDescriptor(webappDirLocation + "/WEB-INF/web.xml");
@@ -37,5 +37,11 @@ public class Main {
 
         server.start();
         server.join();
+
+
+
+//        Context root = new Context(server,"/",Context.SESSIONS);
+//        root.addServlet(new ServletHolder(new ServletContainer(new PackagesResourceConfig("com.sun.jersey.samples.helloworld"))), "/");
+//        server.start();
     }
 }

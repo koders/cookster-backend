@@ -21,7 +21,9 @@ public class Step implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
-    private String pictureUrl;
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "picture_id", nullable = false)
+    private Image picture;
     private Long time;
     @Lob
     private String description;
@@ -38,12 +40,12 @@ public class Step implements Serializable {
         this.id = id;
     }
 
-    public String getPictureUrl() {
-        return pictureUrl;
+    public Image getPicture() {
+        return picture;
     }
 
-    public void setPictureUrl(String pictureUrl) {
-        this.pictureUrl = pictureUrl;
+    public void setPicture(Image picture) {
+        this.picture = picture;
     }
 
     public Long getTime() {

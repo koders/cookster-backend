@@ -3,6 +3,8 @@ package lv.cookster.entity;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -18,6 +20,7 @@ public class Product implements Serializable {
     private static final long serialVersionUID = -7708830264565222353L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
     private String name;
 

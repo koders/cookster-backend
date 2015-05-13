@@ -4,6 +4,7 @@ import lv.cookster.entity.*;
 import lv.cookster.entity.dto.RecipeDto;
 import org.apache.commons.io.FileUtils;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.Query;
 import javax.ws.rs.*;
@@ -20,7 +21,7 @@ import java.util.logging.Logger;
  * @author Rihards
  */
 @Path("/categories")
-@RolesAllowed("admin")
+@PermitAll
 public class CategoryService extends CookingService{
 
     private final static Logger Log = Logger.getLogger(CookingService.class.getName());

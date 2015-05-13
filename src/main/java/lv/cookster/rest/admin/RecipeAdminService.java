@@ -2,20 +2,18 @@ package lv.cookster.rest.admin;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.sun.jersey.multipart.FormDataMultiPart;
 import lv.cookster.entity.*;
 import lv.cookster.entity.dto.RecipeDto;
 import lv.cookster.entity.dto.StepDto;
 import lv.cookster.rest.CookingService;
 import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
 
-import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.io.InputStream;
+import javax.ws.rs.core.Response;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,23 +27,28 @@ import java.util.logging.Logger;
  * @author Rihards
  */
 @Path("/admin/recipes")
-@RolesAllowed("admin")
 public class RecipeAdminService extends CookingService {
 
     private Gson gson = new Gson();
-    private Cache cache = cm.getCache("recipeCache");
+    private Cache cache;
 
     private final static Logger Log = Logger.getLogger(RecipeAdminService.class.getName());
 
+    public RecipeAdminService() {
+        if(cm.getCache("recipeCache") == null) {
+            cm.addCache("recipeCache");
+        }
+        cache = cm.getCache("recipeCache");
+    }
+
     @POST
     @Path("/create")
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public OperationResult createFromJson(FormDataMultiPart multiPart) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public OperationResult createFromJson(String data) {
         OperationResult result = new OperationResult();
         try {
-            Log.log(Level.SEVERE, "### Calling createRecipe");
-            createRecipe(multiPart);
+            createRecipe(data);
             successResult(result);
             cache.remove("allRecipes");
         } catch (JsonSyntaxException e) {
@@ -82,92 +85,120 @@ public class RecipeAdminService extends CookingService {
 //    }
 
     @DELETE
-    @Path("/{id}/delete")
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public OperationResult delete(@PathParam("id") Long id) {
-        OperationResult result = new OperationResult();
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Long id) {
         try {
-            Log.log(Level.SEVERE, "### Calling deleteRecipe RecipeId=<" + id + ">");
             deleteRecipe(id);
-            successResult(result);
             cache.remove("allRecipes");
         } catch (Exception e) {
             Log.log(Level.SEVERE, e.toString(), e);
-            failResult(result, e);
+            return Response.serverError().build();
         }
-        return result;
+        return Response.ok().build();
     }
 
-    @POST
-    @Path("/{id}/edit")
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public OperationResult edit(@PathParam("id") Long id,
-                                @FormParam("data") String data) {
+    @PUT
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response edit(@PathParam("id") Long id,
+                         String data) {
 
-        OperationResult result = new OperationResult();
         try {
-            Log.log(Level.SEVERE, "### Calling editRecipe RecipeId=<" + id + ">");
-            editRecipe(id, data);
-            successResult(result);
+//            Log.log(Level.SEVERE, "### Calling editRecipe RecipeId=<" + id + ">");
+            RecipeDto recipeDto = gson.fromJson(data, RecipeDto.class);
+            editRecipe(id, recipeDto);
             cache.remove("allRecipes");
         } catch (JsonSyntaxException e) {
             Log.log(Level.SEVERE, "Failed to parse JSON.");
-            failResult(result, e);
+            return Response.serverError().build();
         } catch (Exception e) {
             Log.log(Level.SEVERE, "Failed to commit recipe.");
-            failResult(result, e);
+            return Response.serverError().build();
         }
 
-        return result;
+        return Response.ok().build();
 
     }
 
-    private void editRecipe(Long id, String data) {
-        RecipeDto r = gson.fromJson(data, RecipeDto.class);
-
+    private void editRecipe(Long id, RecipeDto recipeDto) {
+        Recipe recipe = em.find(Recipe.class, id);
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
 
-        Recipe recipe = convertToRecipe(r);
-        recipe.setUpdated(new Timestamp(new Date().getTime()));
-        if(recipe.getLevel() != null) {
-            recipe.setLevel(em.find(lv.cookster.entity.Level.class, recipe.getLevel().getId()));
+        try {
+            recipe.setUpdated(new Timestamp(new Date().getTime()));
+            if(recipeDto.getLevel() != null) {
+                recipe.setLevel(em.find(lv.cookster.entity.Level.class, recipeDto.getLevel().getId()));
+            }
+            recipe.setSteps(new ArrayList<Step>());
+            em.merge(recipe);
+
+//        deleteSteps(id);
+
+            for(StepDto s:recipeDto.getSteps()) {
+                Step step = new Step();
+                step.setDescription(s.getDescription());
+                // Picture
+                step.setPicture(findImage(s.getPictureUrl()));
+                if(step.getPicture() == null) {
+                    Image image = new Image(s.getPictureId(), s.getPictureUrl());
+                    step.setPicture(image);
+                }
+                step.setTime(s.getTime());
+                step.setRecipe(recipe);
+                step.setOrderNumber(s.getOrderNumber());
+                em.persist(step);
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
         }
-        em.merge(recipe);
-
-        deleteSteps(id);
-
-        for(StepDto s:r.getSteps()) {
-            Step step = new Step();
-            step.setDescription(s.getDescription());
-            step.setPictureUrl(s.getPictureUrl());
-            step.setTime(s.getStepTime());
-            step.setRecipe(recipe);
-            step.setOrderNumber(s.getOrderNumber());
-            em.persist(step);
-        }
-
-        transaction.commit();
     }
 
     private Recipe convertToRecipe(RecipeDto r) {
         Recipe recipe = new Recipe();
         recipe.setCreated(r.getCreated());
-        recipe.setId(r.getRecipeId());
+        recipe.setId(r.getId());
         recipe.setUpdated(new Timestamp(new Date().getTime()));
         recipe.setTime(r.getTotalTime());
         recipe.setLongName(r.getLongName());
         recipe.setShortName(r.getShortName());
-        recipe.setCategory(r.getCategory());
-        recipe.setDescription(r.getRecipeDescription());
+        Category c = em.find(Category.class, r.getCategory().getId());
+        recipe.setCategory(c);
+        recipe.setDescription(r.getDescription());
         recipe.setExperience(r.getExperience());
-        recipe.setId(r.getRecipeId());
-        recipe.setLevel(r.getLevel());
-        recipe.setAuthor(r.getAuthor());
+        lv.cookster.entity.Level l = em.find(lv.cookster.entity.Level.class, r.getLevel().getId());
+        recipe.setLevel(l);
+        Author a = em.find(Author.class, r.getAuthor().getId());
+        recipe.setAuthor(a);
+        //TODO
         recipe.setIngredients(r.getIngredients());
-        recipe.setPictureUrl(r.getPictureUrl());
-        recipe.setThumbnailUrl(r.getThumbnailUrl());
+        // Picture
+        recipe.setPicture(findImage(r.getPictureUrl()));
+        if(recipe.getPicture() == null) {
+            Image image = new Image(r.getPictureId(), r.getPictureUrl());
+            recipe.setPicture(image);
+        }
+        // Thumbnail
+        recipe.setThumbnail(findImage(r.getThumbnailUrl()));
+        if(recipe.getThumbnail() == null) {
+            Image image = new Image(r.getThumbnailId(), r.getThumbnailUrl());
+            recipe.setThumbnail(image);
+        }
         return recipe;
+    }
+
+    private Image findImage(String url) {
+        Query q = em.createQuery("SELECT i FROM Image i WHERE i.url = :url");
+        q.setParameter("url", url);
+        try {
+            Image result = (Image)q.getSingleResult();
+            return result;
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     private void deleteSteps(Long recipeId) {
@@ -182,57 +213,66 @@ public class RecipeAdminService extends CookingService {
         }
     }
 
-    private void createRecipe(FormDataMultiPart multiPart) throws Exception {
+    private void createRecipe(String data) {
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
 
         try {
-            String shortName = multiPart.getField("shortName").getValueAs(String.class);
-            String longName = multiPart.getField("longName").getValueAs(String.class);
-            String experience = multiPart.getField("experience").getValueAs(String.class);
-            String time = multiPart.getField("time").getValueAs(String.class);
-            String description = multiPart.getField("description").getValueAs(String.class);
-            String category = multiPart.getField("category").getValueAs(String.class);
-            String level = multiPart.getField("level").getValueAs(String.class);
-            String author = multiPart.getField("author").getValueAs(String.class);
 
-            RecipeDto recipeDto = new RecipeDto();
-            recipeDto.setShortName(shortName);
-            recipeDto.setLongName(longName);
-            recipeDto.setExperience(Long.parseLong(experience));
-            recipeDto.setTotalTime(Long.parseLong(time));
-            recipeDto.setRecipeDescription(description);
-
-            recipeDto.setCategory(em.find(Category.class, Long.parseLong(category)));
-            recipeDto.setLevel(em.find(lv.cookster.entity.Level.class, Long.parseLong(level)));
-            recipeDto.setAuthor(em.find(Author.class, Long.parseLong(author)));
-
-            recipeDto.setPictureUrl(uploadFile(multiPart.getField("picture").getValueAs(InputStream.class)));
-            recipeDto.setThumbnailUrl(uploadFile(multiPart.getField("thumbnail").getValueAs(InputStream.class)));
+            RecipeDto recipeDto = gson.fromJson(data, RecipeDto.class);
+//            String shortName = multiPart.getField("shortName").getValueAs(String.class);
+//            String longName = multiPart.getField("longName").getValueAs(String.class);
+//            String experience = multiPart.getField("experience").getValueAs(String.class);
+//            String time = multiPart.getField("time").getValueAs(String.class);
+//            String description = multiPart.getField("description").getValueAs(String.class);
+//            String category = multiPart.getField("category").getValueAs(String.class);
+//            String level = multiPart.getField("level").getValueAs(String.class);
+//            String author = multiPart.getField("author").getValueAs(String.class);
+//
+//            RecipeDto recipeDto = new RecipeDto();
+//            recipeDto.setShortName(shortName);
+//            recipeDto.setLongName(longName);
+//            recipeDto.setExperience(Long.parseLong(experience));
+//            recipeDto.setTotalTime(Long.parseLong(time));
+//            recipeDto.setRecipeDescription(description);
+//
+//            recipeDto.setCategory(em.find(Category.class, Long.parseLong(category)));
+//            recipeDto.setLevel(em.find(lv.cookster.entity.Level.class, Long.parseLong(level)));
+//            recipeDto.setAuthor(em.find(Author.class, Long.parseLong(author)));
+//
+//            recipeDto.setPictureUrl(uploadFile(multiPart.getField("picture").getValueAs(InputStream.class)));
+//            recipeDto.setThumbnailUrl(uploadFile(multiPart.getField("thumbnail").getValueAs(InputStream.class)));
 
             Recipe recipe = convertToRecipe(recipeDto);
             recipe.setCreated(new Timestamp(new Date().getTime()));
 
             em.persist(recipe);
 
-            //shit start
-            for(int i=1; ; i++) {
-                if(multiPart.getField("stepOrderNumber"+i) == null
-                        || multiPart.getField("stepTime"+i) == null
-                        || multiPart.getField("stepDescription"+i) == null
-                        || multiPart.getField("stepPicture"+i) == null) {
-                    break;
-                }
-                String stepOrderNumber = multiPart.getField("stepOrderNumber"+i).getValueAs(String.class);
-                String stepTime = multiPart.getField("stepTime"+i).getValueAs(String.class);
-                String stepDescription = multiPart.getField("stepDescription"+i).getValueAs(String.class);
-                String stepPicture = uploadFile(multiPart.getField("stepPicture"+i).getValueAs(InputStream.class));
+            // Steps
+            for(StepDto stepDto: recipeDto.getSteps()) {
+//                if(multiPart.getField("stepOrderNumber"+i) == null
+//                        || multiPart.getField("stepTime"+i) == null
+//                        || multiPart.getField("stepDescription"+i) == null
+//                        || multiPart.getField("stepPictureId"+i) == null
+//                        || multiPart.getField("stepPictureUrl"+i) == null) {
+//                    break;
+//                }
+//                String stepOrderNumber = multiPart.getField("stepOrderNumber"+i).getValueAs(String.class);
+//                String stepTime = multiPart.getField("stepTime"+i).getValueAs(String.class);
+//                String stepDescription = multiPart.getField("stepDescription"+i).getValueAs(String.class);
+//                String stepPictureId = multiPart.getField("stepPictureId"+i).getValueAs(String.class);
+//                String stepPictureUrl = multiPart.getField("stepPictureUrl"+i).getValueAs(String.class);
 
                 Step step = new Step();
-                step.setOrderNumber(Long.parseLong(stepOrderNumber));
-                step.setPictureUrl(stepPicture);
-                step.setDescription(stepDescription);
-                step.setTime(Long.parseLong(stepTime));
+                step.setOrderNumber(stepDto.getOrderNumber());
+                // Picture
+                step.setPicture(findImage(stepDto.getPictureUrl()));
+                if(step.getPicture() == null) {
+                    Image image = new Image(stepDto.getPictureId(), stepDto.getPictureUrl());
+                    step.setPicture(image);
+                }
+                step.setDescription(stepDto.getDescription());
+                step.setTime(stepDto.getTime());
                 step.setRecipe(recipe);
 
                 em.persist(step);
@@ -257,20 +297,20 @@ public class RecipeAdminService extends CookingService {
         transaction.commit();
     }
 
-    private List<StepDto> convertStepsToDto(List<Step> steps) {
-        List<StepDto> stepsDto = new ArrayList<StepDto>();
-
-        for(Step s:steps) {
-            StepDto stepDto = new StepDto();
-            stepDto.setStepId(s.getId());
-            stepDto.setStepTime(s.getTime());
-            stepDto.setDescription(s.getDescription());
-            stepDto.setPictureUrl(s.getPictureUrl());
-            stepDto.setOrderNumber(s.getOrderNumber());
-            stepsDto.add(stepDto);
-        }
-
-        return stepsDto;
-    }
+//    private List<StepDto> convertStepsToDto(List<Step> steps) {
+//        List<StepDto> stepsDto = new ArrayList<StepDto>();
+//
+//        for(Step s:steps) {
+//            StepDto stepDto = new StepDto();
+//            stepDto.setStepId(s.getId());
+//            stepDto.setStepTime(s.getTime());
+//            stepDto.setDescription(s.getDescription());
+//            stepDto.setPictureUrl(s.getPictureUrl());
+//            stepDto.setOrderNumber(s.getOrderNumber());
+//            stepsDto.add(stepDto);
+//        }
+//
+//        return stepsDto;
+//    }
 
 }

@@ -1,7 +1,12 @@
 package lv.cookster.util;
 
+import com.sun.jersey.multipart.impl.MultiPartConfigProvider;
 import lv.cookster.rest.CategoryService;
+import lv.cookster.rest.admin.CategoryAdminService;
+import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import javax.ws.rs.ApplicationPath;
@@ -13,8 +18,13 @@ import javax.ws.rs.ApplicationPath;
 public class Config extends ResourceConfig {
 
     public Config() {
-        super(CategoryService.class);
+        packages("lv.cookster");
+//        register(MultiPartConfigProvider.class);
         register(RolesAllowedDynamicFeature.class);
+        register(MultiPartFeature.class);
+
+        // Enable Tracing support.
+        property(ServerProperties.TRACING, "ALL");
     }
 
 }

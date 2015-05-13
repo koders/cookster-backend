@@ -23,9 +23,16 @@ import java.util.logging.Logger;
 public class RecipeService extends CookingService {
 
     private Gson gson = new Gson();
-    private Cache cache = cm.getCache("recipeCache");
+    private Cache cache;
 
     private final static Logger Log = Logger.getLogger(RecipeService.class.getName());
+
+    public RecipeService() {
+        if(cm.getCache("recipeCache") == null) {
+            cm.addCache("recipeCache");
+        }
+        cache = cm.getCache("recipeCache");
+    }
 
     @GET
     @Produces("application/json;charset=UTF-8")
@@ -80,9 +87,9 @@ public class RecipeService extends CookingService {
 
 
         RecipeDto resultRecipe = new RecipeDto();
-        resultRecipe.setRecipeId(recipe.getId());
+        resultRecipe.setId(recipe.getId());
         resultRecipe.setCategory(recipe.getCategory());
-        resultRecipe.setRecipeDescription(recipe.getDescription());
+        resultRecipe.setDescription(recipe.getDescription());
         resultRecipe.setExperience(recipe.getExperience());
         resultRecipe.setLongName(recipe.getLongName());
         resultRecipe.setShortName(recipe.getShortName());
@@ -95,8 +102,12 @@ public class RecipeService extends CookingService {
         if(resultRecipe.getAuthor() != null)
             resultRecipe.getAuthor().setRecipes(null);
         resultRecipe.setIngredients(recipe.getIngredients());
-        resultRecipe.setPictureUrl(recipe.getPictureUrl());
-        resultRecipe.setThumbnailUrl(recipe.getThumbnailUrl());
+        if(recipe.getPicture() != null) {
+            resultRecipe.setPictureUrl(recipe.getPicture().getUrl());
+        }
+        if(recipe.getThumbnail() != null) {
+            resultRecipe.setThumbnailUrl(recipe.getThumbnail().getUrl());
+        }
 
         return resultRecipe;
     }
@@ -120,7 +131,7 @@ public class RecipeService extends CookingService {
             List<Step> steps = (List<Step>) q.getResultList();
 
             Step resultStep = steps.get(0);
-            result = resultStep.getPictureUrl();
+            result = resultStep.getPicture().getUrl();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -164,10 +175,12 @@ public class RecipeService extends CookingService {
 
         for(Step s:steps) {
             StepDto stepDto = new StepDto();
-            stepDto.setStepId(s.getId());
-            stepDto.setStepTime(s.getTime());
+            stepDto.setId(s.getId());
+            stepDto.setTime(s.getTime());
             stepDto.setDescription(s.getDescription());
-            stepDto.setPictureUrl(s.getPictureUrl());
+            if(s.getPicture().getUrl() != null) {
+                stepDto.setPictureUrl(s.getPicture().getUrl());
+            }
             stepDto.setOrderNumber(s.getOrderNumber());
             stepsDto.add(stepDto);
         }

@@ -4,6 +4,7 @@ import lv.cookster.entity.Product;
 
 import javax.persistence.Query;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -22,5 +23,4 @@ public class ProductService extends CookingService {
         List<Product> resultList = (List<Product>) q.getResultList();
         return resultList;
     }
-
 }

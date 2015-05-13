@@ -5,18 +5,19 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class StepDto {
 
-    private Long stepId;
+    private Long id;
     private Long orderNumber;
+    private String pictureId;
     private String pictureUrl;
-    private Long stepTime;
+    private Long time;
     private String description;
 
-    public Long getStepId() {
-        return stepId;
+    public Long getId() {
+        return id;
     }
 
-    public void setStepId(Long stepId) {
-        this.stepId = stepId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getOrderNumber() {
@@ -27,6 +28,14 @@ public class StepDto {
         this.orderNumber = orderNumber;
     }
 
+    public String getPictureId() {
+        return pictureId;
+    }
+
+    public void setPictureId(String pictureId) {
+        this.pictureId = pictureId;
+    }
+
     public String getPictureUrl() {
         return pictureUrl;
     }
@@ -35,12 +44,12 @@ public class StepDto {
         this.pictureUrl = pictureUrl;
     }
 
-    public Long getStepTime() {
-        return stepTime;
+    public Long getTime() {
+        return time;
     }
 
-    public void setStepTime(Long stepTime) {
-        this.stepTime = stepTime;
+    public void setTime(Long time) {
+        this.time = time;
     }
 
     public String getDescription() {

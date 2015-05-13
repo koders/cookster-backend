@@ -11,6 +11,7 @@ import java.util.List;
  * Created by Rihards on 15.06.2014.
  */
 @Entity
+@Table(name="\"user\"")
 @XmlRootElement
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class User implements Serializable {

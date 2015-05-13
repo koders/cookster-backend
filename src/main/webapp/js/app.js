@@ -1,32 +1,114 @@
+// Angular
+var cooksterAdminApp = angular.module('cooksterAdminApp', [
+    'ngRoute'
+]);
+
+cooksterAdminApp.config(['$routeProvider',
+    function($routeProvider) {
+        $routeProvider.
+            when('/', {
+                templateUrl: 'dashboard.html',
+                controller: 'DashboardCtrl',
+                title: 'Dashboard'
+            }).
+            when('/recipes', {
+                templateUrl: 'recipes.html',
+                controller: 'RecipesCtrl',
+                title: 'Recipes'
+            }).
+            when('/recipes/create', {
+                templateUrl: 'newRecipe.html',
+                controller: 'RecipesCtrl',
+                title: 'New Recipe'
+            }).
+            otherwise({
+                redirectTo: '/'
+            });
+    }]);
+
+cooksterAdminApp.run(['$location', '$rootScope', function($location, $rootScope) {
+    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+        $rootScope.title = current.$$route.title;
+    });
+}]);
+
+
+
+
+
+
+
+
+
+
+var server = "http://localhost:8080/rest/",
+recipe = {
+    steps : []
+};
+
 $(function(){
-    var stepsCount = 0;
+    var stepCount = 0;
     $('#addStep').on('click', function(e) {
         e.preventDefault();
-        stepsCount++;
-        console.log('adding step '+stepsCount);
+        console.log('adding step '+stepCount);
+
+        recipe.steps.push({});
 
         $('#stepsDiv').append(
-            '<div class="pure-group" id="stepDiv'+stepsCount+'">Step '+stepsCount+
-            '<input id="stepOrderNumber'+stepsCount+'" name="stepOrderNumber'+stepsCount+'" type="text" placeholder="Step '+stepsCount+' order number" value="'+stepsCount+'">' +
-            '<input id="stepTime'+stepsCount+'" name="stepTime'+stepsCount+'" type="text" placeholder="Step '+stepsCount+' time">' +
-            '<input id="stepDescription'+stepsCount+'" name="stepDescription'+stepsCount+'" type="text" placeholder="Step '+stepsCount+' description">' +
-            '<input id="stepPicture'+stepsCount+'" name="stepPicture'+stepsCount+'" type="file">' +
-            '</div>');
+            '<div class="form-group col-md-4" id="stepDiv'+stepCount+'"><div><h4>Step '+stepCount+'</h4></div>' +
+            '<input id="stepOrderNumber'+stepCount+'" class="form-control" name="stepOrderNumber'+stepCount+'" type="text" placeholder="Step '+stepCount+' order number" value="'+stepCount+'">' +
+            '<input id="stepTime'+stepCount+'" class="form-control" name="stepTime'+stepCount+'" type="text" placeholder="Step '+stepCount+' time">' +
+            '<input id="stepDescription'+stepCount+'" class="form-control" name="stepDescription'+stepCount+'" type="text" placeholder="Step '+stepCount+' description">' +
+            '<span id="upload-step' + stepCount + '-picture" class="btn btn-success fileinput-button"><i class="glyphicon glyphicon-plus"></i><span>Select Image...</span> </span> <div class="thumbnail-step' + stepCount + '-picture"></div></div>');
+
+        // Add upload input field
+        $('#upload-step' + stepCount + '-picture').append($.cloudinary.unsigned_upload_tag("vdexbpws",
+            { cloud_name: 'cookster' }));
+
+        // Add picture upload listener
+        // Thumbnail upload listener
+        $('#upload-step' + stepCount + '-picture .cloudinary_fileupload').unsigned_cloudinary_upload("vdexbpws",
+            { cloud_name: 'cookster', tags: 'admin_uploads' },
+            { multiple: false }
+        ).bind('cloudinarydone', function(e, data) {
+
+                var stepId = $(this).parent().attr('id').match('[^0-9]*([0-9]*)')[1];
+                recipe.steps[stepId].pictureUrl = data.result.url;
+                recipe.steps[stepId].pictureId = data.result.public_id;
+
+                $(e.target.parentElement.parentElement).append($.cloudinary.image(data.result.public_id,
+                    {width: 150, height: 100, crop: 'fill'} ))}
+
+        ).bind('cloudinaryprogress', function(e, data) {
+
+                //TODO
+
+            });
+
+        // Initialize step json data
+        recipe.steps[stepCount].orderNumber = stepCount;
+        recipe.steps[stepCount].pictureUrl = "";
+        recipe.steps[stepCount].pictureId = "";
+        recipe.steps[stepCount].time = 0;
+        recipe.steps[stepCount].description = "";
+
+        stepCount++;
 
     });
     $('#removeStep').on('click', function(e) {
         e.preventDefault();
-        if (stepsCount === 0) {
+        if (stepCount === 0) {
             console.log('no more steps to remove!');
             return;
         } else {
-            console.log('removing step '+stepsCount);
+            console.log('removing step '+stepCount);
         }
 
-        var lastStepEl = window.document.getElementById('stepDiv'+stepsCount);
+        var lastStepEl = window.document.getElementById('stepDiv' + (stepCount - 1));
         lastStepEl.parentNode.removeChild(lastStepEl);
 
-        stepsCount--;
+        recipe.steps.pop();
+        stepCount--;
 
     });
 });
@@ -34,104 +116,59 @@ $(function(){
 
 $(document).ready(function(){
 
-    //Facebook
-    window.fbAsyncInit = function() {
-        FB.init({
-            appId      : '1580263095581775',
-            xfbml      : true,
-            version    : 'v2.3'
-        });
-    };
-
-    (function(d, s, id){
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {return;}
-        js = d.createElement(s); js.id = id;
-        js.src = "//connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-
-
-
-    // This is called with the results from from FB.getLoginStatus().
-    function statusChangeCallback(response) {
-        console.log('statusChangeCallback');
-        console.log(response);
-        // The response object is returned with a status field that lets the
-        // app know the current login status of the person.
-        // Full docs on the response object can be found in the documentation
-        // for FB.getLoginStatus().
-        if (response.status === 'connected') {
-            // Logged into your app and Facebook.
-            testAPI();
-        } else if (response.status === 'not_authorized') {
-            // The person is logged into Facebook, but not your app.
-            document.getElementById('status').innerHTML = 'Please log ' +
-            'into this app.';
-        } else {
-            // The person is not logged into Facebook, so we're not sure if
-            // they are logged into this app or not.
-            document.getElementById('status').innerHTML = 'Please log ' +
-            'into Facebook.';
-        }
-    }
-
-    // This function is called when someone finishes with the Login
-    // Button.  See the onlogin handler attached to it in the sample
-    // code below.
-    function checkLoginState() {
-        FB.getLoginStatus(function(response) {
-            statusChangeCallback(response);
-        });
-    }
-
-    window.fbAsyncInit = function() {
-        FB.init({
-            appId      : '1580263095581775',
-            cookie     : true,  // enable cookies to allow the server to access
-                                // the session
-            xfbml      : true,  // parse social plugins on this page
-            version    : 'v2.3' // use version 2.3
-        });
-
-        // Now that we've initialized the JavaScript SDK, we call
-        // FB.getLoginStatus().  This function gets the state of the
-        // person visiting this page and can return one of three states to
-        // the callback you provide.  They can be:
-        //
-        // 1. Logged into your app ('connected')
-        // 2. Logged into Facebook, but not your app ('not_authorized')
-        // 3. Not logged into Facebook and can't tell if they are logged into
-        //    your app or not.
-        //
-        // These three cases are handled in the callback function.
-
-        FB.getLoginStatus(function(response) {
-            statusChangeCallback(response);
-        });
-
-    };
-
-    // Load the SDK asynchronously
-    (function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
-        js.src = "//connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-
-    // Here we run a very simple test of the Graph API after login is
-    // successful.  See statusChangeCallback() for when this call is made.
-    function testAPI() {
-        console.log('Welcome!  Fetching your information.... ');
-        FB.api('/me', function(response) {
-            console.log(JSON.stringify(response));
-            document.getElementById('status').innerHTML =
-                'Thanks for logging in, ' + response.name + '!';
-        });
-    }
+    ////Cloudinary
+    //$.cloudinary.config({ cloud_name: 'cookster', api_key: '923899252498486'});
+    //
+    //$('#upload-picture').append($.cloudinary.unsigned_upload_tag("vdexbpws",
+    //    { cloud_name: 'cookster' }));
+    //
+    //$('#upload-thumbnail').append($.cloudinary.unsigned_upload_tag("vdexbpws",
+    //    { cloud_name: 'cookster' }));
+    //
+    //// Picture upload listener
+    //$('#upload-picture .cloudinary_fileupload').unsigned_cloudinary_upload("vdexbpws",
+    //    { cloud_name: 'cookster', tags: 'admin_uploads' },
+    //    { multiple: false }
+    //).bind('cloudinarydone', function(e, data) {
+    //
+    //        //console.log($.cloudinary.image(data.result.public_id)[0].src);
+    //
+    //        recipe.pictureUrl = data.result.url;
+    //        recipe.pictureId = data.result.public_id;
+    //
+    //        //console.log(recipe);
+    //        //console.log(data.result);
+    //
+    //        //console.log(e);
+    //        $(e.target.parentElement.parentElement).append($.cloudinary.image(data.result.public_id,
+    //            {width: 150, height: 100, crop: 'fill'} ))}
+    //
+    //).bind('cloudinaryprogress', function(e, data) {
+    //
+    //        $('.progress-bar').css('width',
+    //            Math.round((data.loaded * 100.0) / data.total) + '%');
+    //
+    //    });
+    //
+    //
+    //// Thumbnail upload listener
+    //$('#upload-thumbnail .cloudinary_fileupload').unsigned_cloudinary_upload("vdexbpws",
+    //    { cloud_name: 'cookster', tags: 'admin_uploads' },
+    //    { multiple: false }
+    //).bind('cloudinarydone', function(e, data) {
+    //
+    //        recipe.thumbnailUrl = data.result.url;
+    //        recipe.thumbnailId = data.result.public_id;
+    //
+    //        $(e.target.parentElement.parentElement).append($.cloudinary.image(data.result.public_id,
+    //            { format: 'jpg', width: 150, height: 100,
+    //                crop: 'thumb', gravity: 'face', effect: 'saturation:50' } ))}
+    //
+    //).bind('cloudinaryprogress', function(e, data) {
+    //
+    //        //TODO
+    //
+    //    });
 
 
-    //Facebook end
 });

@@ -34,9 +34,6 @@ public class CookingService {
     public CookingService() {
         emf = Persistence.createEntityManagerFactory(Constants.CONNECTION_NAME, System.getProperties());
         em = emf.createEntityManager();
-        if(cm.getCache("recipeCache") == null) {
-            cm.addCache("recipeCache");
-        }
     }
 
     protected String findParam(UriInfo uriInfo, String parameterName) {
@@ -129,12 +126,14 @@ public class CookingService {
 //            recipe.setDescription(r.getDescription());
             recipe.setCategory(r.getCategory());
             recipe.setExperience(r.getExperience());
-            recipe.setRecipeId(r.getId());
+            recipe.setId(r.getId());
 //            recipe.setLongName(r.getLongName());
             recipe.setShortName(r.getShortName());
             recipe.setTotalTime(r.getTime());
             recipe.setLevel(r.getLevel());
-            recipe.setPictureUrl(r.getPictureUrl());
+            if(r.getPicture() != null) {
+                recipe.setPictureUrl(r.getPicture().getUrl());
+            }
             recipe.setAuthor(r.getAuthor());
             if(recipe.getAuthor() != null)
                 recipe.getAuthor().setRecipes(null);

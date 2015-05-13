@@ -30,7 +30,7 @@ public class TestService extends CookingService{
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String facebookTest(@QueryParam("token")String token) {
-        facebookClient = new DefaultFacebookClient(token, "9d10807fb4ed2723dae7eaa118ec28a3" , Version.VERSION_2_3);
+        facebookClient = new DefaultFacebookClient(token, Version.VERSION_2_3);
         return facebookClient.fetchObject("me", User.class).getName();
     }
 }

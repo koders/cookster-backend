@@ -47,8 +47,12 @@ public class Recipe implements Serializable {
     private List<Ingredient> ingredients;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Step> steps;
-    private String thumbnailUrl;
-    private String pictureUrl;
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "thumbnail_id", nullable = false)
+    private Image thumbnail;
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "picture_id", nullable = false)
+    private Image picture;
 
     public Recipe(){}
 
@@ -156,19 +160,19 @@ public class Recipe implements Serializable {
         this.steps = steps;
     }
 
-    public String getThumbnailUrl() {
-        return thumbnailUrl;
+    public Image getThumbnail() {
+        return thumbnail;
     }
 
-    public void setThumbnailUrl(String thumbnailUrl) {
-        this.thumbnailUrl = thumbnailUrl;
+    public void setThumbnail(Image thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
-    public String getPictureUrl() {
-        return pictureUrl;
+    public Image getPicture() {
+        return picture;
     }
 
-    public void setPictureUrl(String pictureUrl) {
-        this.pictureUrl = pictureUrl;
+    public void setPicture(Image picture) {
+        this.picture = picture;
     }
 }

@@ -26,6 +26,9 @@ public class Ingredient implements Serializable {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+    @ManyToOne
+    @JoinColumn(name = "recipe_id", nullable = false)
+    private Recipe recipe;
 
     public Long getId() {
         return id;
@@ -57,5 +60,13 @@ public class Ingredient implements Serializable {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public Recipe getRecipe() {
+        return recipe;
+    }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
     }
 }

@@ -14,6 +14,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.ws.rs.*;
 import java.sql.Timestamp;
@@ -79,15 +80,18 @@ public class UserService extends CookingService {
     @Produces("application/json;charset=UTF-8")
     public OperationResult registerFacebookUserApi(@FormParam("fbToken") String fbToken) {
         OperationResult result= new OperationResult();
-        facebookClient = new DefaultFacebookClient(fbToken, "9d10807fb4ed2723dae7eaa118ec28a3" , Version.VERSION_2_3);
-        com.restfb.types.User fbUser = facebookClient.fetchObject("btaylor", com.restfb.types.User.class);
+        facebookClient = new DefaultFacebookClient(fbToken, Version.VERSION_2_3);
+        com.restfb.types.User fbUser = facebookClient.fetchObject("me", com.restfb.types.User.class);
         if(fbUser == null) {
             result.setMessage("failed to validate token");
             return result;
         }
-        checkIfRegisteredFacebookUser(fbUser);
-        registerFacebookUser(fbUser);
-        result.setMessage("OK");
+        if(!checkIfRegisteredFacebookUser(fbUser)) {
+            registerFacebookUser(fbUser);
+            result.setMessage("OK");
+        } else {
+            result.setMessage("Already registered");
+        }
         return result;
     }
 
@@ -105,8 +109,8 @@ public class UserService extends CookingService {
                                        @FormParam("fbToken")String fbToken,
                                        @FormParam("recipeId")Long recipeId) {
         OperationResult result= new OperationResult();
-        facebookClient = new DefaultFacebookClient(fbToken, "9d10807fb4ed2723dae7eaa118ec28a3" , Version.VERSION_2_3);
-        com.restfb.types.User fbUser = facebookClient.fetchObject("btaylor", com.restfb.types.User.class);
+        facebookClient = new DefaultFacebookClient(fbToken, Version.VERSION_2_3);
+        com.restfb.types.User fbUser = facebookClient.fetchObject("me", com.restfb.types.User.class);
         if(fbUser == null) {
             result.setMessage("failed to validate token");
             return result;
@@ -138,9 +142,14 @@ public class UserService extends CookingService {
      */
     private boolean checkIfRegisteredFacebookUser(com.restfb.types.User fbUser) {
         Query q = em.createQuery("SELECT u FROM User u WHERE u.facebookID = :fbUser");
-        q.setParameter("fbUser", fbUser);
-        User user = (User)q.getSingleResult();
-        return user != null;
+        q.setParameter("fbUser", fbUser.getId());
+        User user = null;
+        try {
+            user = (User)q.getSingleResult();
+        } catch (NoResultException e) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -157,7 +166,9 @@ public class UserService extends CookingService {
             user.setFacebookID(fbUser.getId());
             user.setAbout(fbUser.getAbout());
             user.setContactInfo(fbUser.getEmail());
-            user.setPictureUrl(fbUser.getPicture().getUrl());
+            if(fbUser.getPicture() != null) {
+                user.setPictureUrl(fbUser.getPicture().getUrl());
+            }
             user.setFavorites(new ArrayList<Recipe>());
             em.persist(user);
             transaction.commit();

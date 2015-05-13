@@ -32,7 +32,6 @@ import java.util.logging.Logger;
  * @author Rihards
  */
 @Path("/admin/categories")
-@RolesAllowed("admin")
 public class CategoryAdminService extends CookingService{
 
     private final static Logger Log = Logger.getLogger(CategoryAdminService.class.getName());
@@ -40,7 +39,7 @@ public class CategoryAdminService extends CookingService{
     @POST
     @Path("/create")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces(MediaType.APPLICATION_JSON)
     public OperationResult createCategoryRest(FormDataMultiPart multiPart) {
         String name = multiPart.getField("name").getValueAs(String.class);
         InputStream uploadedInputStream = multiPart.getField("picture").getValueAs(InputStream.class);
@@ -156,10 +155,12 @@ public class CategoryAdminService extends CookingService{
 
         for(Step s:steps) {
             StepDto stepDto = new StepDto();
-            stepDto.setStepId(s.getId());
-            stepDto.setStepTime(s.getTime());
+            stepDto.setId(s.getId());
+            stepDto.setTime(s.getTime());
             stepDto.setDescription(s.getDescription());
-            stepDto.setPictureUrl(s.getPictureUrl());
+            if(s.getPicture() != null) {
+                stepDto.setPictureUrl(s.getPicture().getUrl());
+            }
             stepDto.setOrderNumber(s.getOrderNumber());
             stepsDto.add(stepDto);
         }

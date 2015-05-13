@@ -12,11 +12,11 @@ import java.util.List;
 @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class RecipeDto {
 
-    private Long recipeId;
+    private Long id;
     private String shortName;
     private Long totalTime;
     private String longName;
-    private String recipeDescription;
+    private String description;
     private Long experience;
     private Category category;
     private Timestamp created;
@@ -24,9 +24,10 @@ public class RecipeDto {
     private Level level;
     private Author author;
     private List<Ingredient> ingredients;
-//    private String ingredients;
     private String thumbnailUrl;
+    private String thumbnailId;
     private String pictureUrl;
+    private String pictureId;
     private List<StepDto> steps;
 
     public RecipeDto(){
@@ -41,12 +42,12 @@ public class RecipeDto {
         this.steps = steps;
     }
 
-    public Long getRecipeId() {
-        return recipeId;
+    public Long getId() {
+        return id;
     }
 
-    public void setRecipeId(Long recipeId) {
-        this.recipeId = recipeId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getShortName() {
@@ -73,12 +74,12 @@ public class RecipeDto {
         this.longName = longName;
     }
 
-    public String getRecipeDescription() {
-        return recipeDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setRecipeDescription(String recipeDescription) {
-        this.recipeDescription = recipeDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Long getExperience() {
@@ -145,11 +146,27 @@ public class RecipeDto {
         this.thumbnailUrl = thumbnailUrl;
     }
 
+    public String getThumbnailId() {
+        return thumbnailId;
+    }
+
+    public void setThumbnailId(String thumbnailId) {
+        this.thumbnailId = thumbnailId;
+    }
+
     public String getPictureUrl() {
         return pictureUrl;
     }
 
     public void setPictureUrl(String pictureUrl) {
         this.pictureUrl = pictureUrl;
+    }
+
+    public String getPictureId() {
+        return pictureId;
+    }
+
+    public void setPictureId(String pictureId) {
+        this.pictureId = pictureId;
     }
 }

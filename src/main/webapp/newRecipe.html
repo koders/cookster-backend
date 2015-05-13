@@ -1,0 +1,128 @@
+<div class="row mbl">
+    <div class="col-lg-12">
+        <div class="col-md-12">
+            <div id="area-chart-spline" style="width: 100%; height: 300px; display: none;">
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="panel panel-orange">
+                    <div class="panel-heading">
+                        Recipe</div>
+                    <div class="panel-body pan">
+                        <form action="#" class="form-horizontal">
+                            <div class="form-body pal">
+                                <div class="row">
+                                    <!-- Recipe stuff -->
+                                    <div class="form-group">
+                                      <label for="shortName" class="col-md-3 control-label">Short Name</label>
+                                        <div class="icon-right">
+                                            <input id="shortName" ng-model="recipe.shortName" name="shortName" type="text" placeholder="Short name" class="col-md-9 form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="longName" class="col-md-3 control-label">Long Name</label>
+                                        <div class="icon-right">
+                                            <input id="longName" ng-model="recipe.longName" name="longName" type="text" placeholder="Long Name" class="col-sm-4 form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="experience" class="col-md-3 control-label">Experience</label>
+                                        <div class="icon-right">
+                                            <input id="experience" name="experience" type="text" placeholder="Experience" class="col-sm-4 form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="time" class="col-md-3 control-label">Time</label>
+                                        <div class="icon-right">
+                                            <input id="time" name="time" type="text" placeholder="Time" class="col-sm-4 form-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="description" class="col-md-3 control-label">Description</label>
+                                      <div class="icon-right">
+                                        <input id="description" name="description" type="text" placeholder="Description" class="col-sm-4 form-control">
+                                      </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="category" class="col-md-3 control-label">Category</label>
+                                      <div class="icon-right">
+                                        <select id="category" name="category" class="col-sm-4 form-control">
+                                            <option ng-repeat="category in categories" value="{{category.id}}">{{category.name}}</option>
+                                        </select>
+                                      </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="level" class="col-md-3 control-label">Level</label>
+                                        <div class="icon-right">
+                                        <select id="level" name="level" class="col-sm-4 form-control">
+                                            <option ng-repeat="level in levels" value="{{level.id}}">{{level.level}}</option>
+                                        </select>
+                                      </div>
+                                      <div class="clearfix"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="author" class="col-md-3 control-label">Author</label>
+                                      <div class="icon-right">
+                                        <select id="author" name="author" class="col-sm-4 form-control">
+                                            <option ng-repeat="author in authors" value="{{author.id}}">{{author.name}}</option>
+                                        </select>
+                                      </div>
+                                      <div class="clearfix"></div>
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="upload-picture" class="col-md-3 control-label">Picture</label>
+                                      <span id="upload-picture" class="fileinput-button">
+                                        <!--<i class="glyphicon glyphicon-plus"></i>-->
+                                        <!--<span>Select Image...</span>-->
+                                      </span>
+                                      <!--<div id="progress-picture" class="progress">-->
+                                        <!--<div class="progress-bar progress-bar-success"></div>-->
+                                      <!--</div>-->
+                                    </div>
+
+                                    <div class="form-group">
+                                      <label for="upload-thumbnail" class="col-md-3 control-label">Thumbnail</label>
+                                      <span id="upload-thumbnail" class="fileinput-button">
+                                      </span>
+                                      <!--<div id="progress-thumbnail" class="progress">-->
+                                        <!--<div class="progress-bar progress-bar-success"></div>-->
+                                      <!--</div>-->
+                                      <div class="thumbnail-thumbnail"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div ng-repeat="step in recipe.steps | orderBy:'orderNumber':false">
+                                        <div class="form-group col-md-4" id="stepDiv{{step.orderNumber}}">
+                                            <div><h4>Step {{step.orderNumber}}</h4></div>
+                                            <input id="step{{step.orderNumber}}-order-number" ng-model="step.orderNumber" class="form-control" type="text" placeholder="Step {{step.orderNumber}} order number" value="{{step.orderNumber}}">'
+                                            <input id="step{{step.orderNumber}}-time" ng-model="step.time" class="form-control" type="text" placeholder="Step {{step.orderNumber}} time">
+                                            <input id="step{{step.orderNumber}}-description" ng-model="step.description" class="form-control" type="text" placeholder="Step {{step.orderNumber}} description">
+                                            <span id="upload-step{{step.orderNumber}}-picture" class="fileinput-button"></span>
+                                            <div class="thumbnail-step{{step.orderNumber}}-picture"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button ng-click="addStep($event)" class="btn btn-success">Add Step</button>
+                            </div>
+                            <div class="form-actions text-right pal">
+                                <button ng-click="submitRecipe($event)" class="btn btn-primary">
+                                    Create</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

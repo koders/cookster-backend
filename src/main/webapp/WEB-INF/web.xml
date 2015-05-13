@@ -13,6 +13,15 @@
         </init-param>
     </servlet>
 
+    <servlet>
+        <servlet-name>lv.cookster.util.Config</servlet-name>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>lv.cookster.util.Config</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>

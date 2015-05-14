@@ -1,6 +1,7 @@
 // Angular
 var cooksterAdminApp = angular.module('cooksterAdminApp', [
-    'ngRoute'
+    'ngRoute',
+    'ui.bootstrap'
 ]);
 
 cooksterAdminApp.config(['$routeProvider',

@@ -10,6 +10,7 @@ cooksterAdminApp.controller('RecipesCtrl',function($scope, $http, api){
 
     $scope.recipe = {};
     $scope.recipe.steps = [];
+    $scope.recipe.ingredients = [];
 
     api.listRecipes('recipes',function(results) {
         $scope.recipes = results;
@@ -22,6 +23,12 @@ cooksterAdminApp.controller('RecipesCtrl',function($scope, $http, api){
     });
     api.listLevels('levels',function(results) {
         $scope.levels = results;
+    });
+    api.listProducts('products',function(results) {
+        $scope.products = results;
+    });
+    api.listMeasurements('measurements',function(results) {
+        $scope.measurements = results;
     });
 
     //Cloudinary
@@ -73,10 +80,25 @@ cooksterAdminApp.controller('RecipesCtrl',function($scope, $http, api){
 
     });
 
+    $scope.addIngredient = function($event) {
+        $event.preventDefault();
+        var pos = $scope.recipe.ingredients.length;
+        $scope.recipe.ingredients.push({id:pos});
+    };
+
+    $scope.removeIngredient = function(id) {
+        for(var i = 0; i < $scope.recipe.ingredients.length; i++) {
+            if($scope.recipe.ingredients[i].id == id) {
+                $scope.recipe.ingredients.splice(i, 1);
+                return;
+            }
+        }
+    };
+
     $scope.addStep = function($event) {
+        $event.preventDefault();
         var orderNumber = $scope.recipe.steps.length;
         $scope.recipe.steps.push({orderNumber: orderNumber});
-        $event.preventDefault();
 
         setTimeout(function(){
             // Add upload input field
@@ -111,7 +133,7 @@ cooksterAdminApp.controller('RecipesCtrl',function($scope, $http, api){
 
                 });
         }, 100);
-    }
+    };
 
     $scope.submitRecipe = function($event) {
         $event.preventDefault();
@@ -123,7 +145,7 @@ cooksterAdminApp.controller('RecipesCtrl',function($scope, $http, api){
         res.error(function(){
             alert("failed");
         });
-    }
+    };
 
 });
 
@@ -146,7 +168,9 @@ cooksterAdminApp.factory('api', function($http){
         listRecipes: getData,
         listCategories: getData,
         listAuthors: getData,
-        listLevels: getData
+        listLevels: getData,
+        listProducts: getData,
+        listMeasurements: getData
     };
 });
 

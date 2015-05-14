@@ -150,6 +150,18 @@ public class RecipeAdminService extends CookingService {
                 em.persist(step);
             }
 
+            // Ingredients
+//            for(Ingredient ingredient:recipeDto.getIngredients()) {
+//                if(ingredient.getProduct() != null) {
+//                    ingredient.setProduct(em.find(Product.class, ingredient.getProduct().getId()));
+//                }
+//                if(ingredient.getMeasurement() != null) {
+//                    ingredient.setMeasurement(em.find(Measurement.class, ingredient.getMeasurement().getId()));
+//                }
+//                ingredient.setRecipe(recipe);
+//                em.persist(ingredient);
+//            }
+
             transaction.commit();
         } catch (Exception e) {
             transaction.rollback();
@@ -175,6 +187,9 @@ public class RecipeAdminService extends CookingService {
         recipe.setAuthor(a);
         //TODO
         recipe.setIngredients(r.getIngredients());
+        for(Ingredient ingredient:recipe.getIngredients()) {
+            ingredient.setRecipe(recipe);
+        }
         // Picture
         recipe.setPicture(findImage(r.getPictureUrl()));
         if(recipe.getPicture() == null) {

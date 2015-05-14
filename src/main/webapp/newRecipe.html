@@ -19,42 +19,42 @@
                                     <div class="form-group">
                                       <label for="shortName" class="col-md-3 control-label">Short Name</label>
                                         <div class="icon-right">
-                                            <input id="shortName" ng-model="recipe.shortName" name="shortName" type="text" placeholder="Short name" class="col-md-9 form-control">
+                                            <input id="shortName" ng-model="recipe.shortName" type="text" placeholder="Short name" class="col-md-9 form-control">
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                       <label for="longName" class="col-md-3 control-label">Long Name</label>
                                         <div class="icon-right">
-                                            <input id="longName" ng-model="recipe.longName" name="longName" type="text" placeholder="Long Name" class="col-sm-4 form-control">
+                                            <input id="longName" ng-model="recipe.longName" type="text" placeholder="Long Name" class="col-sm-4 form-control">
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                       <label for="experience" class="col-md-3 control-label">Experience</label>
                                         <div class="icon-right">
-                                            <input id="experience" name="experience" type="text" placeholder="Experience" class="col-sm-4 form-control">
+                                            <input id="experience" ng-model="recipe.experience" type="text" placeholder="Experience" class="col-sm-4 form-control">
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                       <label for="time" class="col-md-3 control-label">Time</label>
                                         <div class="icon-right">
-                                            <input id="time" name="time" type="text" placeholder="Time" class="col-sm-4 form-control">
+                                            <input id="time" ng-model="recipe.time" type="text" placeholder="Time" class="col-sm-4 form-control">
                                         </div>
                                     </div>
 
                                     <div class="form-group">
                                       <label for="description" class="col-md-3 control-label">Description</label>
                                       <div class="icon-right">
-                                        <input id="description" name="description" type="text" placeholder="Description" class="col-sm-4 form-control">
+                                        <input id="description" ng-model="recipe.description" type="text" placeholder="Description" class="col-sm-4 form-control">
                                       </div>
                                     </div>
 
                                     <div class="form-group">
                                       <label for="category" class="col-md-3 control-label">Category</label>
                                       <div class="icon-right">
-                                        <select id="category" name="category" class="col-sm-4 form-control">
+                                        <select id="category" ng-model="recipe.category.id" class="col-sm-4 form-control">
                                             <option ng-repeat="category in categories" value="{{category.id}}">{{category.name}}</option>
                                         </select>
                                       </div>
@@ -63,7 +63,7 @@
                                     <div class="form-group">
                                       <label for="level" class="col-md-3 control-label">Level</label>
                                         <div class="icon-right">
-                                        <select id="level" name="level" class="col-sm-4 form-control">
+                                        <select id="level" ng-model="recipe.level.id" class="col-sm-4 form-control">
                                             <option ng-repeat="level in levels" value="{{level.id}}">{{level.level}}</option>
                                         </select>
                                       </div>
@@ -73,7 +73,7 @@
                                     <div class="form-group">
                                       <label for="author" class="col-md-3 control-label">Author</label>
                                       <div class="icon-right">
-                                        <select id="author" name="author" class="col-sm-4 form-control">
+                                        <select id="author" ng-model="recipe.author.id" class="col-sm-4 form-control">
                                             <option ng-repeat="author in authors" value="{{author.id}}">{{author.name}}</option>
                                         </select>
                                       </div>
@@ -101,7 +101,28 @@
                                       <div class="thumbnail-thumbnail"></div>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <div class="col-md-12"><h3>Ingredients</h3></div>
+                                    <div ng-repeat="ingredient in recipe.ingredients">
+                                        <div class="row">
+                                            <div class="form-group col-md-4">
+                                                <input type="text" ng-model="ingredient.product.name" typeahead="product.name for product in products | filter:$viewValue | limitTo:8" typeahead-on-select="ingredient.product = $item" class="form-control">
+                                            </div>
+                                            <div class="form-group col-md-3">
+                                                <input ng-model="ingredient.quantity" class="form-control col-md-3" type="text" placeholder="Quantity">
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <input type="text" ng-model="ingredient.measurement.name" typeahead="measurement.name for measurement in measurements | filter:$viewValue | limitTo:8" typeahead-on-select="ingredient.measurement = $item" class="form-control">
+                                            </div>
+                                            <div class="form-group col-md-1">
+                                                <a href="" ng-click="removeIngredient(ingredient.id)" class="btn btn-danger col-md-1">X</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button ng-click="addIngredient($event)" class="btn btn-success">Add Ingredient</button>
                                 <div class="row">
+                                    <div class="col-md-12"><h3>Steps</h3></div>
                                     <div ng-repeat="step in recipe.steps | orderBy:'orderNumber':false">
                                         <div class="form-group col-md-4" id="stepDiv{{step.orderNumber}}">
                                             <div><h4>Step {{step.orderNumber}}</h4></div>

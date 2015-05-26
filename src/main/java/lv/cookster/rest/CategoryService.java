@@ -61,7 +61,7 @@ public class CategoryService extends CookingService{
         try {
             Category c = em.find(Category.class, Long.valueOf(id));
             File file = new File("tmpPic.jpeg");
-            FileUtils.copyURLToFile(new URL(c.getPictureUrl()), file);
+//            FileUtils.copyURLToFile(new URL(c.getPictureUrl()), file);
             return Response.ok(file).build();
         } catch (Exception e) {
             e.printStackTrace();

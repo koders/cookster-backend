@@ -47,48 +47,48 @@ public class InitService extends CookingService {
             em.persist(level);
 
             //Initialize cateogries
-            Category category = new Category();
-            category.setName("Kūkas");
-            category.setPaid(false);
-            category.setPictureUrl("umad.png");
-            em.persist(category);
-
-            category = new Category();
-            category.setName("Veģetāri ēdieni");
-            category.setPaid(false);
-            category.setPictureUrl("umad.png");
-            em.persist(category);
-
-            category = new Category();
-            category.setName("Uzkodas");
-            category.setPaid(true);
-            category.setPictureUrl("umad.png");
-            em.persist(category);
-
-            category = new Category();
-            category.setName("Grila ēdieni");
-            category.setPaid(false);
-            category.setPictureUrl("umad.png");
-            em.persist(category);
-
-            category = new Category();
-            category.setName("Gaļas ēdieni");
-            category.setPaid(true);
-            category.setPrice(0.89);
-            category.setPictureUrl("umad.png");
-            em.persist(category);
-
-            category = new Category();
-            category.setName("Zupas");
-            category.setPaid(false);
-            category.setPictureUrl("umad.png");
-            em.persist(category);
-
-            category = new Category();
-            category.setName("Brokastu ēdieni");
-            category.setPaid(true);
-            category.setPictureUrl("umad.png");
-            em.persist(category);
+//            Category category = new Category();
+//            category.setName("Kūkas");
+//            category.setPaid(false);
+//            category.setPictureUrl("umad.png");
+//            em.persist(category);
+//
+//            category = new Category();
+//            category.setName("Veģetāri ēdieni");
+//            category.setPaid(false);
+//            category.setPictureUrl("umad.png");
+//            em.persist(category);
+//
+//            category = new Category();
+//            category.setName("Uzkodas");
+//            category.setPaid(true);
+//            category.setPictureUrl("umad.png");
+//            em.persist(category);
+//
+//            category = new Category();
+//            category.setName("Grila ēdieni");
+//            category.setPaid(false);
+//            category.setPictureUrl("umad.png");
+//            em.persist(category);
+//
+//            category = new Category();
+//            category.setName("Gaļas ēdieni");
+//            category.setPaid(true);
+//            category.setPrice(0.89);
+//            category.setPictureUrl("umad.png");
+//            em.persist(category);
+//
+//            category = new Category();
+//            category.setName("Zupas");
+//            category.setPaid(false);
+//            category.setPictureUrl("umad.png");
+//            em.persist(category);
+//
+//            category = new Category();
+//            category.setName("Brokastu ēdieni");
+//            category.setPaid(true);
+//            category.setPictureUrl("umad.png");
+//            em.persist(category);
 
             //Init authors
             Author a = new Author();

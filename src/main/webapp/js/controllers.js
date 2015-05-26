@@ -138,7 +138,7 @@ cooksterAdminApp.controller('RecipesCtrl',function($scope, $http, api){
     $scope.submitRecipe = function($event) {
         $event.preventDefault();
 
-        var res = $http.post("/rest/admin/recipes/create", $scope.recipe);
+        var res = $http.post("/rest/admin/recipes", $scope.recipe);
         res.success(function(){
             alert("ok");
         });

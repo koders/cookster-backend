@@ -33,6 +33,7 @@ public class User implements Serializable {
             inverseJoinColumns = { @JoinColumn(name = "recipe_id",
                     nullable = false) })
     private List<Recipe> favorites;
+    private boolean isAdmin;
 
     public Long getId() {
         return id;
@@ -88,5 +89,13 @@ public class User implements Serializable {
 
     public void setFavorites(List<Recipe> favorites) {
         this.favorites = favorites;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

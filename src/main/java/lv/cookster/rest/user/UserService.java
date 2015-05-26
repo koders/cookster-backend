@@ -46,7 +46,7 @@ public class UserService extends CookingService {
     @GET
     @Path("/{id}")
     @Produces("application/json;charset=UTF-8")
-    public User getRecipe(@PathParam("id") Long userId) {
+    public User getUser(@PathParam("id") Long userId) {
 
         User user = em.find(User.class, userId);
 

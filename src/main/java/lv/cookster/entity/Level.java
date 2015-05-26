@@ -18,7 +18,6 @@ public class Level implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
-    @OneToMany(mappedBy="level",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Long id;
     private String level;
 

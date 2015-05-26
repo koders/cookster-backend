@@ -1,10 +1,9 @@
 package lv.cookster.rest.admin;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.sun.jersey.multipart.FormDataMultiPart;
-import lv.cookster.entity.Category;
-import lv.cookster.entity.OperationResult;
-import lv.cookster.entity.Recipe;
-import lv.cookster.entity.Step;
+import lv.cookster.entity.*;
 import lv.cookster.entity.dto.RecipeDto;
 import lv.cookster.entity.dto.StepDto;
 import lv.cookster.rest.CookingService;
@@ -20,7 +19,9 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -34,47 +35,57 @@ import java.util.logging.Logger;
 @Path("/admin/categories")
 public class CategoryAdminService extends CookingService{
 
+    private Gson gson = new Gson();
     private final static Logger Log = Logger.getLogger(CategoryAdminService.class.getName());
 
     @POST
-    @Path("/create")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
-    public OperationResult createCategoryRest(FormDataMultiPart multiPart) {
-        String name = multiPart.getField("name").getValueAs(String.class);
-        InputStream uploadedInputStream = multiPart.getField("picture").getValueAs(InputStream.class);
-        boolean isPaid = multiPart.getField("isPaid").getValueAs(boolean.class);
-        double price = multiPart.getField("price").getValueAs(double.class);
-//                                  @FormDataParam("picture") InputStream uploadedInputStream,
-//                                  @FormDataParam("picture") FormDataContentDisposition fileDetail,
-//                                  @FormDataParam("isPaid") boolean isPaid,
-//                                  @FormDataParam("price") double price) {
+    public OperationResult createCategoryRest(String data) {
+
         OperationResult result = new OperationResult();
         try {
-            Log.log(Level.SEVERE, "### Calling createCategory");
-
-            String uuid = UUID.randomUUID().toString();
-
-            String uploadedFileLocation = Constants.PROJECT_BASE_LOCATION + Constants.SOURCE_FOLDER + uuid;
-            String uploadedFileLocation2 = Constants.PROJECT_BASE_LOCATION + Constants.TARGET_FOLDER + uuid;
-
-            // save it
-            writeToFile(uploadedInputStream, uploadedFileLocation);
-            FileUtils.copyFile(new File(uploadedFileLocation), new File(uploadedFileLocation2));
-
-            String urlName = Constants.BASE_URI + "uploads/" + uuid;
-
-            createCategory(name, urlName, isPaid, price);
-
-            String output = "File accessible from : " + urlName;
-
-            result.setMessage(output);
-            result.setResultCode(Constants.OPERATION_SUCCESSFUL_CODE);
+            createCategory(data);
+            successResult(result);
+        } catch (JsonSyntaxException e) {
+            Log.log(Level.SEVERE, "Failed to parse JSON.");
+            e.printStackTrace();
+            failResult(result, e);
         } catch (Exception e) {
+            Log.log(Level.SEVERE, "Failed to commit category.");
             e.printStackTrace();
             failResult(result, e);
         }
         return result;
+
+//        String name = multiPart.getField("name").getValueAs(String.class);
+//        InputStream uploadedInputStream = multiPart.getField("picture").getValueAs(InputStream.class);
+//        boolean isPaid = multiPart.getField("isPaid").getValueAs(boolean.class);
+//        double price = multiPart.getField("price").getValueAs(double.class);
+//        OperationResult result = new OperationResult();
+//        try {
+//            Log.log(Level.SEVERE, "### Calling createCategory");
+//
+//            String uuid = UUID.randomUUID().toString();
+//
+//            String uploadedFileLocation = Constants.PROJECT_BASE_LOCATION + Constants.SOURCE_FOLDER + uuid;
+//            String uploadedFileLocation2 = Constants.PROJECT_BASE_LOCATION + Constants.TARGET_FOLDER + uuid;
+//
+//            // save it
+//            writeToFile(uploadedInputStream, uploadedFileLocation);
+//            FileUtils.copyFile(new File(uploadedFileLocation), new File(uploadedFileLocation2));
+//
+//            String urlName = Constants.BASE_URI + "uploads/" + uuid;
+//
+//            createCategory(name, urlName, isPaid, price);
+//
+//            String output = "File accessible from : " + urlName;
+//
+//            result.setMessage(output);
+//            result.setResultCode(Constants.OPERATION_SUCCESSFUL_CODE);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            failResult(result, e);
+//        }
+//        return result;
     }
 
 
@@ -126,19 +137,20 @@ public class CategoryAdminService extends CookingService{
         transaction.commit();
     }
 
-    private void createCategory(String name, String pictureUrl, boolean isPaid, double price) {
+    private boolean createCategory(String data) {
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
 
-        Category u = new Category();
-        u.setName(name);
-        u.setPictureUrl(pictureUrl);
-        u.setPaid(isPaid);
-        u.setPrice(price);
-
-        em.persist(u);
-
-        transaction.commit();
+        try {
+            Category category = gson.fromJson(data, Category.class);
+            em.persist(category);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     private void deleteCategory(String id) {

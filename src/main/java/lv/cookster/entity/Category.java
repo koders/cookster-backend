@@ -24,7 +24,9 @@ public class Category implements Serializable {
     private String name;
     private boolean isPaid;
     private Double price;
-    private String pictureUrl;
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "picture_id", nullable = true)
+    private Image picture;
 
     public Long getId() {
         return id;
@@ -46,7 +48,7 @@ public class Category implements Serializable {
         return isPaid;
     }
 
-    public void setPaid(boolean isPaid) {
+    public void setIsPaid(boolean isPaid) {
         this.isPaid = isPaid;
     }
 
@@ -58,11 +60,11 @@ public class Category implements Serializable {
         this.price = price;
     }
 
-    public String getPictureUrl() {
-        return pictureUrl;
+    public Image getPicture() {
+        return picture;
     }
 
-    public void setPictureUrl(String pictureUrl) {
-        this.pictureUrl = pictureUrl;
+    public void setPicture(Image picture) {
+        this.picture = picture;
     }
 }

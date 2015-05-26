@@ -40,35 +40,21 @@ public class RecipeService extends CookingService {
                                       @QueryParam("dateTo")Timestamp dateTo,
                                       @QueryParam("count")Integer count) {
 
-        List<RecipeDto> recipes;
-
-        //Check in cache
-        Element element = cache.get("allRecipes");
-        if(element != null) {
-            //Cache hit
-            return (List<RecipeDto>)element.getObjectValue();
-        }
-
-        //Cache miss
-        Query q = em.createQuery("SELECT r FROM Recipe r");
-        List<Recipe> recipesList = (List<Recipe>) q.getResultList();
-
+        List<Recipe> recipes;
         List<Recipe> resultList = new ArrayList<Recipe>();
 
+        recipes = fetchRecipes();
+
+        //Filter
         Integer i = 0;
-        for(Recipe r:recipesList) {
+        for(Recipe r:recipes) {
             if((dateFrom == null || r.getUpdated().after(dateFrom))
                     &&(dateTo == null || r.getUpdated().before(dateTo))
                     && (count == null || i++ < count))
                 resultList.add(r);
         }
 
-        recipes = convertRecipesToDtoSmall(resultList);
-
-        //Add to cache
-        cache.put(new Element("allRecipes", recipes));
-
-        return recipes;
+        return convertRecipesToDtoSmall(resultList);
     }
 
 
@@ -77,14 +63,23 @@ public class RecipeService extends CookingService {
     @Produces("application/json;charset=UTF-8")
     public RecipeDto getRecipe(@PathParam("id") Long recipeId) {
 
-        Recipe recipe = em.find(Recipe.class, recipeId);
+        Recipe recipe = null;
+
+        List<Recipe> recipes = fetchRecipes();
+
+        for(Recipe r: recipes) {
+            if(recipeId == r.getId()) {
+                recipe = r;
+                break;
+            }
+        }
+
         if(recipe == null)
             return null;
 
-        Query q = em.createQuery("SELECT s FROM Step s where s.recipe.id = :recipeId");
-        q.setParameter("recipeId", recipeId);
-        List<Step> steps = (List<Step>) q.getResultList();
-
+//        Query q = em.createQuery("SELECT s FROM Step s where s.recipe.id = :recipeId");
+//        q.setParameter("recipeId", recipeId);
+//        List<Step> steps = (List<Step>) q.getResultList();
 
         RecipeDto resultRecipe = new RecipeDto();
         resultRecipe.setId(recipe.getId());
@@ -94,7 +89,7 @@ public class RecipeService extends CookingService {
         resultRecipe.setLongName(recipe.getLongName());
         resultRecipe.setShortName(recipe.getShortName());
         resultRecipe.setTotalTime(recipe.getTime());
-        resultRecipe.setSteps(convertStepsToDto(steps));
+        resultRecipe.setSteps(convertStepsToDto(recipe.getSteps()));
         resultRecipe.setCreated(recipe.getCreated());
         resultRecipe.setUpdated(recipe.getUpdated());
         resultRecipe.setLevel(recipe.getLevel());
@@ -186,6 +181,24 @@ public class RecipeService extends CookingService {
         }
 
         return stepsDto;
+    }
+
+    protected List<Recipe> fetchRecipes() {
+        List<Recipe> recipes;
+        //Check in cache
+        Element element = cache.get("allRecipes");
+        if(element != null) {
+            //Cache hit
+            recipes = (List<Recipe>)element.getObjectValue();
+        } else {
+            //Cache miss
+            Query q = em.createQuery("SELECT r FROM Recipe r");
+            recipes = (List<Recipe>) q.getResultList();
+
+            //Add to cache
+            cache.put(new Element("allRecipes", recipes));
+        }
+        return recipes;
     }
 
 }

@@ -42,7 +42,6 @@ public class RecipeAdminService extends CookingService {
     }
 
     @POST
-    @Path("/create")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public OperationResult createFromJson(String data) {
